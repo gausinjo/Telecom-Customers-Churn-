@@ -1,0 +1,86 @@
+# ==============================================================================
+# Global Project Configuration
+# ==============================================================================
+project:
+  name: "telecom-churn-prediction"
+  version: "1.0.0"
+  seed: 32
+
+# ==============================================================================
+# File Paths & Data Destinations
+# ==============================================================================
+paths:
+  raw_data: "data/Telecom_Churn.csv"
+  #processed_dir: "data/processed/"
+  #train_data: "data/processed/train.parquet"
+  #test_data: "data/processed/test.parquet"
+  #artifacts_dir: "models"
+  #saved_model: "models/churn_pipeline_v1.joblib"
+  #metrics_output: "models/metrics.json"
+
+# ==============================================================================
+# Feature Engineering & Column Definitions
+# ==============================================================================
+features:
+  target: "Churn"
+  id_column: "CustomerID"
+  
+  numerical:
+    - "Tenure"
+    - "MonthlyCharges"
+    - "TotalCharges"
+  
+  categorical:
+    - "Contract"
+    - "PaymentMethod"
+    - "InternetService"
+
+  feature_importance:
+    top_n: 15
+
+# ==============================================================================
+# Data Splitting & Preprocessing
+# ==============================================================================
+data_split:
+  test_size: 0.3
+  #stratify: true
+
+#preprocessing:
+  #imputation_strategy_num: "median"
+  #imputation_strategy_cat: "most_frequent"
+  #scaling: "standard" # Options: standard, minmax, robust
+
+# ==============================================================================
+# Model Hyperparameters & Search Grids
+# ==============================================================================
+modeling:
+  
+  xgboost:
+    model__n_estimators: [100, 300]
+    model__max_depth: [3, 5]
+    model__learning_rate: [0.01, 0.05, 0.1]
+    model__subsample: [0.8, 1.0]
+    model__colsample_bytree: [0.8, 1]
+    model__scale_pos_weight: [1.0, 2.5, 3] # Balancing positive churn class
+
+  lightgbm:
+    model__n_estimators: [100, 300]
+    model__num_leaves: [15, 31]
+    model__max_depth: [-1, 10]
+    model__learning_rate: [0.05, 0.1]
+    model__subsample: [0.8, 1.0]
+    model__colsample_bytree: [0.8, 1.0]
+    model__scale_pos_weight: [1.0, 2.5]
+    
+  random_forest:
+    model__n_estimators: [100, 300]
+    model__max_depth: [10, 20, null]
+    model__min_samples_split: [2, 5]
+    model__class_weight: ["balanced"]
+
+  logistic_regression: 
+    model__penalty: ["l1", "l2"]
+    model__C: [0.01, 0.1, 1, 10]
+    model__solver: ["liblinear"]
+    model__class_weight: [null, "balanced"]
+
